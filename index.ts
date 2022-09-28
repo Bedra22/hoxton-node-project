@@ -97,20 +97,64 @@ app.get("/validation", async (req, res) => {
 app.get("/tweets", async (req, res) => {
   try {
     const tweets = await prisma.tweets.findMany({ include: { User: true } });
-    res.send(tweets);
+    const reversedTweets = tweets.reverse();
+    res.send(reversedTweets);
   } catch (error) {}
 });
 
-app.post("/create-tweet/:authorId", async (req, res) => {
-  const tweet = await prisma.tweets.create({
-    data: {
-      title: "asdsa",
-      content: req.body.content,
-      userId: Number(req.params.authorId),
-      image: req.body.image,
-    },
+// app.post("/create-tweet/:authorId", async (req, res) => {
+//   const tweet = await prisma.tweets.create({
+//     data: {
+//       title: "asdsa",
+//       content: req.body.content,
+//       userId: Number(req.params.authorId),
+//       image: req.body.image,
+//     },
+//   });
+//   res.send(tweet);
+// });
+
+app.post("/tweet", async (req, res) => {
+  await prisma.tweets.create({
+    data: req.body,
+    include: { like: true, comment: true },
   });
-  res.send(tweet);
+  const newTweet = await prisma.tweets.findMany({
+    include: { User: true, like: true, comment: true },
+  });
+  res.send(newTweet);
+});
+// })
+app.get("/user", async (req, res) => {
+  const user = await prisma.user.findMany({
+    // @ts-ignore
+    include: { tweets: true, comment: true },
+  });
+  res.send(user);
+});
+
+app.get("/user/:id", async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(req.params.id) },
+    // @ts-ignore
+    include: { tweets: true, comment: true },
+  });
+  res.send(user);
+});
+
+// app.get('/tweets', async (req, res) => {
+//     const tweets = await prisma.tweets.findMany({
+//         include: { User: true, like: true, comment: true }
+//     })
+//     res.send(tweets)
+// })
+
+app.get("/tweets/:id", async (req, res) => {
+  const tweets = await prisma.tweets.findUnique({
+    where: { id: Number(req.params.id) },
+    include: { User: true, like: true, comment: true },
+  });
+  res.send(tweets);
 });
 
 app.listen(port, () => {
