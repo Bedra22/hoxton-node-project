@@ -89,7 +89,11 @@ app.get('/user/:id', async (req, res) => {
         where: { id: Number(req.params.id) },
         include: { tweets: true, comment: true }
     })
-    res.send(user)
+    if (user) {
+        res.send(user)
+    } else {
+        res.status(404).send({ error: "User not found" })
+    }
 })
 
 app.get('/tweets', async (req, res) => {
@@ -104,8 +108,21 @@ app.get('/tweets/:id', async (req, res) => {
         where: { id: Number(req.params.id) },
         include: { User: true, like: true, comment: true }
     })
-    res.send(tweets)
+    if (tweets) {
+        res.send(tweets)
+    } else {
+        res.status(404).send({ error: "Tweet not found" })
+    }
 })
+
+app.post('/tweet', async (req, res) => {
+    await prisma.tweets.create({ data: req.body, include: { like: true, comment: true } })
+    const newTweet = await prisma.tweets.findMany({
+        include: { User: true, like: true, comment: true }
+    })
+    res.send(newTweet)
+})
+
 
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`)
