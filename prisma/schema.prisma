@@ -19,7 +19,7 @@ model User {
   tweets     Tweets[]
   trends     Trends[]
   chat       Chat[]
-  comment    Comment[]
+  Comment    Comment[]
 }
 
 model Trends {

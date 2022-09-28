@@ -79,6 +79,18 @@ app.get('/validation', async (req, res) => {
     }
 
 })
+app.get('/user', async (req, res) => {
+    const user = await prisma.user.findMany({ include: { tweets: true, comment: true } })
+    res.send(user)
+})
+
+app.get('/user/:id', async (req, res) => {
+    const user = await prisma.user.findUnique({
+        where: { id: Number(req.params.id) },
+        include: { tweets: true, comment: true }
+    })
+    res.send(user)
+})
 
 app.get('/tweets', async (req, res) => {
     const tweets = await prisma.tweets.findMany({
