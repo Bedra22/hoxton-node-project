@@ -87,6 +87,14 @@ app.get('/tweets', async (req, res) => {
     res.send(tweets)
 })
 
+app.get('/tweets/:id', async (req, res) => {
+    const tweets = await prisma.tweets.findUnique({
+        where: { id: Number(req.params.id) },
+        include: { User: true, like: true, comment: true }
+    })
+    res.send(tweets)
+})
+
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`)
 })
