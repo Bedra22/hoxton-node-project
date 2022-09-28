@@ -80,6 +80,13 @@ app.get('/validation', async (req, res) => {
 
 })
 
+app.get('/tweets', async (req, res) => {
+    const tweets = await prisma.tweets.findMany({
+        include: { User: true, like: true, comment: true }
+    })
+    res.send(tweets)
+})
+
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`)
 })
