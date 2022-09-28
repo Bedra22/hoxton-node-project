@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.3.1",
+    "@prisma/client": "^4.4.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
@@ -23,6 +23,6 @@
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "prisma": "^4.3.1"
+    "prisma": "^4.4.0"
   }
 }

@@ -5,22 +5,26 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./data.db"
+  provider          = "sqlite"
+  url               = "file:./data.db"
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
   id         Int       @id @default(autoincrement())
   email      String    @unique
   password   String
-  fullName   String
   profilePic String?
   phoneNr    Int?
-  Bio        String?
+  bio        String?
+  fullName   String?
   tweets     Tweets[]
   trends     Trends[]
   chat       Chat[]
-  Comment    Comment[]
+  comment    Comment[]
+  like       Like[]
+  retweet    ReTweet[]
+  save       Save[]
 }
 
 model Trends {
@@ -33,27 +37,50 @@ model Trends {
 }
 
 model Tweets {
-  id      Int       @id @default(autoincrement())
-  content String?
-  image   String?
-  User    User?     @relation(fields: [userId], references: [id])
-  userId  Int?
-  like    Like[]
-  comment Comment[]
+  id          Int       @id @default(autoincrement())
+  content     String?
+  image       String?
+  publishTime DateTime  @default(now())
+  User        User?     @relation(fields: [userId], references: [id])
+  userId      Int?
+  like        Like[]
+  comment     Comment[]
+  retweet     ReTweet[]
+  save        Save[]
 }
 
 model Comment {
-  id      Int      @id @default(autoincrement())
-  content String
-  User    User?    @relation(fields: [userId], references: [id])
-  userId  Int?
-  Tweets  Tweets[]
+  id          Int      @id @default(autoincrement())
+  content     String
+  publishTime DateTime @default(now())
+  User        User?    @relation(fields: [userId], references: [id])
+  userId      Int?
+  Tweets      Tweets?  @relation(fields: [tweetsId], references: [id])
+  tweetsId    Int?
 }
 
 model Like {
   id       Int     @id @default(autoincrement())
   Tweets   Tweets? @relation(fields: [tweetsId], references: [id])
   tweetsId Int?
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model ReTweet {
+  id       Int     @id @default(autoincrement())
+  Tweets   Tweets? @relation(fields: [tweetsId], references: [id])
+  tweetsId Int?
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model Save {
+  id       Int     @id @default(autoincrement())
+  Tweets   Tweets? @relation(fields: [tweetsId], references: [id])
+  tweetsId Int?
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
 }
 
 model Chat {
