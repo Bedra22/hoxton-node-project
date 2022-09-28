@@ -113,6 +113,17 @@ app.get("/tweets", async (req, res) => {
 //   });
 //   res.send(tweet);
 // });
+app.get("/user/:id", async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(req.params.id) },
+    include: { tweets: true, Comment: true },
+  });
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send({ error: "User not found" });
+  }
+});
 
 app.post("/tweet", async (req, res) => {
   await prisma.tweets.create({
@@ -127,8 +138,7 @@ app.post("/tweet", async (req, res) => {
 // })
 app.get("/user", async (req, res) => {
   const user = await prisma.user.findMany({
-    // @ts-ignore
-    include: { tweets: true, comment: true },
+    include: { tweets: true, Comment: true },
   });
   res.send(user);
 });
@@ -136,8 +146,7 @@ app.get("/user", async (req, res) => {
 app.get("/user/:id", async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: Number(req.params.id) },
-    // @ts-ignore
-    include: { tweets: true, comment: true },
+    include: { tweets: true, Comment: true },
   });
   res.send(user);
 });
@@ -149,12 +158,34 @@ app.get("/user/:id", async (req, res) => {
 //     res.send(tweets)
 // })
 
+// app.get("/tweets/:id", async (req, res) => {
+//   const tweets = await prisma.tweets.findUnique({
+//     where: { id: Number(req.params.id) },
+//     include: { User: true, like: true, comment: true },
+//   });
+//   res.send(tweets);
+// });
 app.get("/tweets/:id", async (req, res) => {
   const tweets = await prisma.tweets.findUnique({
     where: { id: Number(req.params.id) },
     include: { User: true, like: true, comment: true },
   });
-  res.send(tweets);
+  if (tweets) {
+    res.send(tweets);
+  } else {
+    res.status(404).send({ error: "Tweet not found" });
+  }
+});
+
+app.post("/tweet", async (req, res) => {
+  await prisma.tweets.create({
+    data: req.body,
+    include: { like: true, comment: true },
+  });
+  const newTweet = await prisma.tweets.findMany({
+    include: { User: true, like: true, comment: true },
+  });
+  res.send(newTweet);
 });
 
 app.listen(port, () => {
