@@ -238,6 +238,12 @@ app.post('/save', async (req, res) => {
         res.status(400).send({ error: error.message })
     }
 })
+
+app.get('/trends', async (req, res) => {
+    const trends = await prisma.trends.findMany({ include: { User: true } })
+    res.send(trends)
+})
+
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`);
 });
