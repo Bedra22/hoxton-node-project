@@ -174,6 +174,12 @@ app.post('/comment', async (req, res) => {
     res.send(getComments)
 })
 
+app.get('/retweets', async (req, res) => {
+    const retweets = await prisma.reTweet.findMany({ include: { Tweets: true, User: true } })
+    res.send(retweets)
+})
+
+
 
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`);
