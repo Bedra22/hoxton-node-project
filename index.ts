@@ -179,8 +179,42 @@ app.get('/retweets', async (req, res) => {
     res.send(retweets)
 })
 
+app.post('/retweets', async (req, res) => {
+    try {
+        const newReTweet = await prisma.reTweet.create({
+            data: {
+                tweetsId: Number(req.body.tweetsId),
+                userId: Number(req.body.userId)
+            },
+            include: { Tweets: true, User: true }
+        })
+        res.send(newReTweet)
+    } catch (error) {
+        //@ts-ignore
+        res.status(400).send({ error: error.message })
+    }
+})
 
+app.get('/save', async (req, res) => {
+    const saves = await prisma.save.findMany({ include: { Tweets: true, User: true } })
+    res.send(saves)
+})
 
+app.post('/save', async (req, res) => {
+    try {
+        const newSave = await prisma.save.create({
+            data: {
+                tweetsId: Number(req.body.tweetsId),
+                userId: Number(req.body.userId)
+            },
+            include: { Tweets: true, User: true }
+        })
+        res.send(newSave)
+    } catch (error) {
+        //@ts-ignore
+        res.status(400).send({ error: error.message })
+    }
+})
 app.listen(port, () => {
     console.log(`App is running in http://localhost:${port}`);
 });
