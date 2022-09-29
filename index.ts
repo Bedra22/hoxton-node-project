@@ -122,7 +122,7 @@ app.get("/user/:id", async (req, res) => {
 app.get("/tweets", async (req, res) => {
     try {
         //@ts-ignore
-        const tweets = await prisma.tweets.findMany({ include: { User: true, retweet: true, save: true } });
+        const tweets = await prisma.tweets.findMany({ include: { User: true, retweet: true, save: true, comment: true, like: true } });
         const reversedTweets = tweets.reverse();
         res.send(reversedTweets);
     } catch (error) {
@@ -164,16 +164,37 @@ app.get('/comments', async (req, res) => {
 })
 
 app.post('/comment', async (req, res) => {
-    await prisma.comment.create({
-        data: req.body,
-        include: { Tweets: true, User: true }
-    })
-    const getComments = await prisma.comment.findMany({
-        include: { Tweets: true, User: true }
-    })
-    res.send(getComments)
+    try {
+        await prisma.comment.create({
+            data: req.body,
+            include: { Tweets: true, User: true }
+        })
+        const getComments = await prisma.comment.findMany({
+            include: { Tweets: true, User: true }
+        })
+        res.send(getComments)
+    } catch (error) {
+        //@ts-ignore
+        res.status(400).send({ error: error.message })
+    }
 })
-
+// app.get('/like', async (req, res) => {
+//     const likes = await prisma.like.findMany({ include: { Tweets: true, User: true } })
+//     res.send(likes)
+// })
+app.post('/like', async (req, res) => {
+    try {
+        await prisma.like.create({
+            data: req.body,
+            include: { Tweets: true, User: true }
+        })
+        const likes = await prisma.like.findMany({ include: { Tweets: true, User: true } })
+        res.send(likes)
+    } catch (error) {
+        //@ts-ignore
+        res.status(400).send({ error: error.message })
+    }
+})
 app.get('/retweets', async (req, res) => {
     const retweets = await prisma.reTweet.findMany({ include: { Tweets: true, User: true } })
     res.send(retweets)
@@ -181,14 +202,15 @@ app.get('/retweets', async (req, res) => {
 
 app.post('/retweets', async (req, res) => {
     try {
-        const newReTweet = await prisma.reTweet.create({
+        await prisma.reTweet.create({
             data: {
                 tweetsId: Number(req.body.tweetsId),
                 userId: Number(req.body.userId)
             },
             include: { Tweets: true, User: true }
         })
-        res.send(newReTweet)
+        const retweets = await prisma.reTweet.findMany({ include: { Tweets: true, User: true } })
+        res.send(retweets)
     } catch (error) {
         //@ts-ignore
         res.status(400).send({ error: error.message })
@@ -202,14 +224,15 @@ app.get('/save', async (req, res) => {
 
 app.post('/save', async (req, res) => {
     try {
-        const newSave = await prisma.save.create({
+        await prisma.save.create({
             data: {
                 tweetsId: Number(req.body.tweetsId),
                 userId: Number(req.body.userId)
             },
             include: { Tweets: true, User: true }
         })
-        res.send(newSave)
+        const saves = await prisma.save.findMany({ include: { Tweets: true, User: true } })
+        res.send(saves)
     } catch (error) {
         //@ts-ignore
         res.status(400).send({ error: error.message })
