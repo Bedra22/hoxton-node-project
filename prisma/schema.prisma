@@ -30,7 +30,7 @@ model User {
 model Trends {
   id          Int    @id @default(autoincrement())
   type        String
-  trendTweets Int
+  trendTweets String
   title       String
   userId      Int
   User        User   @relation(fields: [userId], references: [id])
